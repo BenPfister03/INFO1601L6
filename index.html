@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <title>Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  </head>
+
+  <body>
+    <nav>
+        <div class="nav-wrapper teal" style="padding-left: 10px;">
+           <a href="#!" class="brand-logo">Ajax Demo</a>
+        </div>
+    </nav>
+    <main class="row" style="padding: 40px">
+         <table>
+           <thead>
+                <tr>
+                   <th>#</th>
+                   <th>name</th>
+                   <th>Type</th>
+                   <th>website</th>
+                </tr>
+                </thead>
+                  <tbody id="result">
+                                                
+                  </tbody>
+           </table>
+           <div id="details"></div>
+     </main>
+     <script>
+      async function getData(url, renderFun){
+        try{
+          let response = await fetch(url);//1. Send http request and get response
+          let result = await response.json();//2. Get data from response
+          renderFun(result);// 3. Do something with the data
+        }catch(e){
+            console.log(e);//catch and log any errors
+        }
+      }
+
+      function drawTable(records){
+          let result = document.querySelector('#result');
+          let html = '';
+          for(let record of records){
+              html += `<tr id="${record.id}">
+                <td>${record.id}</td>
+                <td>${record.name}</td>
+                <td>${record.brewery_type}</td>
+                <td><a href="#${record.id}" onclick="getData('https://api.openbrewerydb.org/breweries/${record.id}', drawDetails)" >View More Details</a></td>    
+              </tr>`;
+          }
+          result.innerHTML = html;
+      }
+
+      function drawDetails(brewery){
+          let detailsDiv = document.querySelector('#details');
+          let html = `
+            <h2>${brewery.name} Details</h2>
+            <p>Type: ${brewery.brewery_type}</p>
+            <p>Address: ${brewery.street}, ${brewery.city}, ${brewery.state}, ${brewery.postal_code}, ${brewery.country}</p>
+            <p>Phone: ${brewery.phone}</p>
+            <p>Website: <a href="${brewery.website_url}" target="_blank">${brewery.website_url}</a></p>
+          `;
+          detailsDiv.innerHTML = html;
+      }
+
+      getData("https://api.openbrewerydb.org/breweries", drawTable);
+     </script>
+  </body>
+</html>
